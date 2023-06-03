@@ -1,0 +1,76 @@
+                                    # Importando bibliotecas #
+import matplotlib.pyplot as plt
+import pymysql
+import numpy as np
+                                         # Variáveis #
+Nome  = []
+Nota  = []
+Nota2 = []
+Nota3 = []
+                                         # Parâmetros #
+conn = pymysql.connect(host     ="projetopsq.mysql.uhserver.com",
+                      user     ="aluno2023",
+                      password = "@UnS2023",
+                      db       = "projetopsq")
+Aula = conn.cursor()                     # Abrindo o banco de dados
+Aula.execute("SELECT * from registro")   # Selecionar todos os dados da tabela 'registro'
+for linha in(Aula.fetchall()):           # Selecionando as linhas
+   Nome.append(linha[1])                 # Especificando em qual linha está o item
+   Nota.append(float(linha[3]))          # Especificando em qual linha está o item
+   Nota2.append(float(linha[4]))         # Especificando em qual linha está o item
+   Nota3.append(float(linha[5]))         # Especificando em qual linha está o item
+conn.commit()
+conn.close()
+
+
+                             # Gerando Gráfico #
+fig, ax = plt.subplots(tight_layout=True)  # Ajustar automaticamente os parâmetros
+width =0.58                                # Espaço entre as barras
+
+
+x = np.arange(len(Nota))                   # Criar arranjos com valores de forma uniforme dentro de um determinado intervalo
+
+
+ax.set_ylabel("NOTA", color="#2A2F4F",  fontsize = 15)   # Barra  vertical
+ax.set_xlabel("NOME", color="#2A2F4F", fontsize = 15)    # Barra horizontal
+ax.set_title("GRÁFICO DAS NOTAS",  
+              color="#2A2F4F",  
+              fontsize = 25, pad= 20) # Título
+N  = ax.bar(x - width/2,
+            Nota , 
+            color="#6A5ACD", 
+            width=0.25)                # Gerar a barra do gráfico
+N2 = ax.bar(x, 
+            Nota2,
+            color="#6495ED",  
+            width=0.25)                # Gerar a barra do gráfico
+N3 = ax.bar(x + width/2 ,
+            Nota3, 
+            color="#00BFFF", 
+            width=0.25)                               # Gerar a barra do gráfico
+ax.legend(["Nota 1", "Nota 2", "Nota 3"])             # Gerar legenda
+ax.set_xticks(x, Nome, rotation= 90, ha='center')     # Inclinar os nomes
+
+
+                                             # Adicionando valores na barra #
+def autolabel(valor):                     # Criar uma função
+   for i in valor:                                    # Loop
+       height = i.get_height()                        # Pegar valores da função
+       ax.annotate('{}'.format(height),               # Imprimir o valor da altura
+      rotation = 12,                                  # Rotação dos valores
+      xy=(i.get_x() + i.get_width() / 2, height),     # Posição do valor
+      xytext=(0,3),                                   # Distância do números para a barra
+      textcoords="offset points",                     # Validar os valores na coordenadas certas
+      ha='center', va='bottom')                       # Posicionar no centro de cada barra
+
+
+autolabel(N)  # Imprimir os valores sobre a barra
+autolabel(N2) # Imprimir os valores sobre a barra
+autolabel(N3) # Imprimir os valores sobre a barra
+
+
+plt.show()    # Imprimir Gráfico
+
+
+
+
